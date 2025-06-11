@@ -179,6 +179,25 @@
         <p><strong>Xe ra trễ hẹn:</strong> ${treHen}</p>
       `;
     }
-  </script>
+  <script>
+  let dsXe = [];
+
+  window.onload = function () {
+    firebase.database().ref("xe").once("value").then(snapshot => {
+      dsXe = snapshot.val() || [];
+      hienThiXe();
+    });
+  };
+
+  function themXe() {
+    // thêm xe vào mảng
+    // ...
+    firebase.database().ref("xe").set(dsXe); // lưu lại toàn bộ mảng
+  }
+
+  function hienThiXe() {
+    // hiển thị danh sách xe như bạn đã viết
+  }
+</script>
 </body>
 </html>
