@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quản Lý Xe</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .card { border: 1px solid #ccc; padding: 16px; margin-bottom: 16px; border-left: 4px solid blue; }
+    .form-group { margin-bottom: 10px; }
+    .text-green { color: green; }
+    .text-red { color: red; }
+    .text-purple { color: purple; }
+  </style>
+</head>
+<body>
+  <h1>Quản Lý Xe</h1>
+
+  <div id="form">
+    <div class="form-group">
+      <input type="text" id="loaiXe" placeholder="Loại xe" />
+      <input type="text" id="bienSo" placeholder="Biển số" />
+      <input type="date" id="thoiGianVao" />
+      <input type="text" id="thoPhuTrach" placeholder="Thợ phụ trách" />
+      <input type="date" id="thoiGianHen" placeholder="Thời gian khách hẹn" />
+      <select id="trangThai">
+        <option value="Dang sua chua">Đang sửa chữa</option>
+        <option value="Cho phu tung">Chờ phụ tùng</option>
+      </select>
+      <button onclick="themXe()">Thêm xe</button>
+    </div>
+  </div>
+
+  <div id="boLoc">
+    <input type="date" id="locNgay" placeholder="Lọc theo ngày" onchange="hienThiXe()" />
+    <input type="text" id="locTho" placeholder="Lọc theo thợ" oninput="hienThiXe()" />
+  </div>
+
+  <div id="thongKe"></div>
+  <div id="danhSachXe"></div>
+
+  <script>
+    let dsXe = [];
+
+    function themXe() {
+      const loaiXe = document.getElementById('loaiXe').value;
+      const bienSo = document.getElementById('bienSo').value;
+      const thoiGianVao = document.getElementById('thoiGianVao').value;
+      const thoiGianHen = document.getElementById('thoiGianHen').value;
+      const thoPhuTrach = document.getElementById('thoPhuTrach').value;
+      const trangThai = document.getElementById('trangThai').value;
+
+      if (!loaiXe || !bienSo || !thoiGianVao || !thoPhuTrach) return;
+
+      dsXe.push({
+        loaiXe,
+        bienSo,
+        thoiGianVao,
+        thoiGianHen,
+        thoiGianRa: "",
+        thoPhuTrach,
+        trangThai
+      });
+
+      document.querySelectorAll('#form input').forEach(input => input.value = '');
+      document.getElementById('trangThai').value = 'Dang sua chua';
+
+      hienThiXe();
+    }
+
+    function capNhatRa(index) {
+      dsXe[index].thoiGianRa = new Date().toISOString().slice(0, 10);
+      hienThiXe();
+    }
+
+    function thayDoiTrangThai(index, value) {
+      dsXe[index].trangThai = value;
+      hienThiXe();
+    }
+
+    function tinhSoNgay(vao, ra) {
+      if (!vao || !ra) return 0;
+      const date1 = new Date(vao);
+      const date2 = new Date(ra);
+      const diff = Math.floor((date2 - date1) / (1000 * 60 * 60 * 24));
+      return diff;
+    }
+
+    function hienThiXe() {
+      const locNgay = document.getElementById('locNgay').value;
+      const locTho = document.getElementById('locTho').value.toLowerCase();
+
+      const xeLoc = dsXe.filter(x => {
+        const ngayTrung = locNgay ? x.thoiGianVao.startsWith(locNgay) : true;
+        const thoTrung = locTho ? x.thoPhuTrach.toLowerCase().includes(locTho) : true;
+        return ngayTrung && thoTrung;
+      });
+
+      const container = document.getElementById('danhSachXe');
+      container.innerHTML = "";
+
+      let tongNgay = 0;
+      let dangSua = 0;
+      let choPhuTung = 0;
+      let dungHen = 0;
+      let treHen = 0;
+
+      xeLoc.forEach((x, idx) => {
+        const ngay = tinhSoNgay(x.thoiGianVao, x.thoiGianRa);
+        if (x.thoiGianRa) tongNgay += ngay;
+        if (x.trangThai === "Dang sua chua") dangSua++;
+        if (x.trangThai === "Cho phu tung") choPhuTung++;
+
+        let henClass = "";
+        if (x.thoiGianHen && x.thoiGianRa) {
+          const hen = new Date(x.thoiGianHen);
+          const ra = new Date(x.thoiGianRa);
+          if (ra.toDateString() === hen.toDateString()) {
+            henClass = "text-green";
+            dungHen++;
+          } else if (ra > hen) {
+            henClass = "text-red";
+            treHen++;
+          } else if (ra < hen) {
+            henClass = "text-purple";
+          }
+        }
+
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <div><strong>Loại xe:</strong> ${x.loaiXe}</div>
+          <div><strong>Biển số:</strong> ${x.bienSo}</div>
+          <div><strong>Thời gian vào:</strong> ${x.thoiGianVao}</div>
+          <div><strong>Thời gian ra:</strong> ${
+            x.thoiGianRa
+              ? `<span class="${henClass}">${x.thoiGianRa}</span>`
+              : `<button onclick="capNhatRa(${idx})">Cập nhật giờ ra</button>`
+          }</div>
+          <div><strong>Thời gian khách hẹn:</strong> ${x.thoiGianHen || "--"}</div>
+          <div><strong>Thợ phụ trách:</strong> ${x.thoPhuTrach}</div>
+          <div><strong>Thời gian trong xưởng:</strong> ${x.thoiGianRa ? `${ngay} ngày` : "--"}</div>
+          <div><strong>Trạng thái:</strong> 
+            <select onchange="thayDoiTrangThai(${idx}, this.value)">
+              <option value="Dang sua chua" ${x.trangThai === "Dang sua chua" ? "selected" : ""}>Đang sửa chữa</option>
+              <option value="Cho phu tung" ${x.trangThai === "Cho phu tung" ? "selected" : ""}>Chờ phụ tùng</option>
+            </select>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('thongKe').innerHTML = `
+        <p><strong>Tổng thời gian các xe đã ở trong xưởng:</strong> ${tongNgay} ngày</p>
+        <p><strong>Xe đang sửa chữa:</strong> ${dangSua}</p>
+        <p><strong>Xe chờ phụ tùng:</strong> ${choPhuTung}</p>
+        <p><strong>Xe ra đúng hẹn:</strong> ${dungHen}</p>
+        <p><strong>Xe ra trễ hẹn:</strong> ${treHen}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
