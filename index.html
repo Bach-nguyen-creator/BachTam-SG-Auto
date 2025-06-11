@@ -188,6 +188,7 @@
       hienThiXe();
     });
   };
+    
 
   function themXe() {
     // thêm xe vào mảng
@@ -199,5 +200,63 @@
     // hiển thị danh sách xe như bạn đã viết
   }
 </script>
-</body>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
+  // Thay thông tin bên dưới bằng config từ Firebase Console của bạn
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  // Đăng nhập
+  function dangNhap() {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then(user => {
+        alert("Đăng nhập thành công");
+        docDuLieu(); // đọc dữ liệu khi đăng nhập thành công
+      })
+      .catch(error => alert("Sai tài khoản hoặc mật khẩu"));
+  }
+
+  // Ghi dữ liệu
+  function ghiDuLieu() {
+    firebase.database().ref("xe").set(dsXe);
+  }
+
+  // Đọc dữ liệu
+  function docDuLieu() {
+    firebase.database().ref("xe").once("value").then(snapshot => {
+      dsXe = snapshot.val() || [];
+      hienThiXe();
+    });
+  }
+
+  // Tự động đọc dữ liệu khi trang load
+  window.onload = function() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        docDuLieu();
+      }
+    });
+  };
+</script>
+</body> 
+  <div id="login-form">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="dangNhap()">Đăng nhập</button>
+</div>
 </html>
