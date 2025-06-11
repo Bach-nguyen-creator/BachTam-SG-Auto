@@ -87,16 +87,19 @@
       document.getElementById('trangThai').value = 'Dang sua chua';
 
       hienThiXe();
+      ghiDuLieu(); // 🔄 Ghi dữ liệu lên Firebase
     }
 
     function capNhatRa(index) {
       dsXe[index].thoiGianRa = new Date().toISOString().slice(0, 10);
       hienThiXe();
+      ghiDuLieu(); // 🔄 Ghi dữ liệu lên Firebase
     }
 
     function thayDoiTrangThai(index, value) {
       dsXe[index].trangThai = value;
       hienThiXe();
+      ghiDuLieu(); // 🔄 Ghi dữ liệu lên Firebase
     }
 
     function tinhSoNgay(vao, ra) {
