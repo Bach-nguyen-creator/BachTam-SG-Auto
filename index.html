@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
+<head> <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbAwXW1PTzGotqsimLnDudw-mtgfgOJxA",
+    authDomain: "data-vehicle-management-system.firebaseapp.com",
+    projectId: "data-vehicle-management-system",
+    storageBucket: "data-vehicle-management-system.firebasestorage.app",
+    messagingSenderId: "239103665240",
+    appId: "1:239103665240:web:1afa91c9e3dc6249d3562d",
+    measurementId: "G-2SHDCGKHS9"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
   <meta charset="UTF-8" />
   <title>Quản Lý Xe</title>
   <style>
